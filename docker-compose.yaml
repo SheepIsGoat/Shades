@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/front/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_BACKEND_URL=http://backend:3000
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/back/Dockerfile
+    environment:
+      - SANITY_TOKEN=${SANITY_TOKEN}
+    ports:
+      - "3000:3000"
