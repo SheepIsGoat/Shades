@@ -71,9 +71,9 @@ app.get('/search', async (req: Request, res: Response) => {
     if (!searchTerm) {
         return res.status(400).send('Search term is required');
     }
-  
+    console.log("Received search request " + searchTerm)
     const cleanSearchTerm: string = cleanQuery(searchTerm);
-    const query: string = `*[_type == "tile" && title match "${cleanSearchTerm}*"]{name,title,header,slug,status,publishDate,owner}`;
+    const query: string = `*[_type == "tile" && title match "${cleanSearchTerm}*"]{name,title,summary,slug,status,publishDate,owner,sharingImage1x1Url}`;
     const encodedQuery = encodeURIComponent(query);
   
     try {
@@ -87,6 +87,57 @@ app.get('/search', async (req: Request, res: Response) => {
         console.error('Error:', error.message);
         res.status(500).send('Internal Server Error');
     }
-  });
+});
+
+app.post('/like', async (req: Request, res: Response) => {
+    handle([like, getLiked], res, req);
+});
+
+app.post('/unlike', async (req: Request, res: Response) => {
+    handle([unlike, getLiked], res, req);
+});
+
+const likeCache = new Map<string, object>() ;
+
+type RequestHandler = (res: Response, req: Request) => jsonAble;
+type jsonAble = object | Array<object> | void;
+
+function handle(funcs: Array<RequestHandler>, res: Response, req: Request){
+    try {
+        let response: jsonAble = []
+        for (const func of funcs) {
+            response = func(res, req)
+        }
+        console.log(`Returning ${response}`)
+        res.status(200).json(response)
+    } catch(error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+function getLiked(res?: Response, req?: Request): Array<object> {
+    return Array.from(likeCache.values());
+}
+
+function like(res: Response, req: Request) {
+    if ('body' in req && 'title' in req.body) {
+        console.log(`Body: ${req.body}`)
+        const singleJsonObject = req.body;
+        likeCache.set(singleJsonObject.title, singleJsonObject);
+        return
+    }
+}
+
+function unlike(res: Response, req: Request) {
+    if ('body' in req && 'title' in req.body) {
+        console.log(`Body: ${req.body}`)
+        const singleJsonObject = req.body;
+        likeCache.delete(singleJsonObject.title);
+        return
+    }
+}
+
+
 
 export {};

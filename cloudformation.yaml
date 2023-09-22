@@ -64,6 +64,23 @@ Parameters:
     Description: the URL to your image in ECR or Dockerhub
     Default: "563310265560.dkr.ecr.us-west-1.amazonaws.com/shades-frontend:latest"
 
+  SanityToken:
+    Type: String
+    Description: Api key for sanity studios
+  AppHost:
+    Type: String
+    Description: The host for nginx
+    Default: localhost
+  AppPort:
+    Type: Number
+    Description: The port to route requests to
+    Default: 3000
+  VpcCidr:
+    Description: CIDR block for the VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+
 Mappings:
   # if these cause an issue, update them for your regions
   AWSRegionToAMI: 
@@ -152,11 +169,15 @@ Resources:
               awslogs-group: !Ref CloudwatchLogsGroup
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: shades
-          MountPoints:
-            - ContainerPath: /usr/share/nginx/html
-              SourceVolume: my-vol
+          # MountPoints:
+          #   - ContainerPath: /usr/share/nginx/html
+          #     SourceVolume: my-vol
           PortMappings:
-            - ContainerPort: 3001
+            - ContainerPort: 3000
+              # HostPort: 3000  # delete this, for external only
+          Environment:
+            - Name: SANITY_TOKEN
+              Value: !Ref SanityToken
 
         - Name: frontend
           Cpu: 1
@@ -175,6 +196,14 @@ Resources:
               SourceVolume: my-vol
           PortMappings:
             - ContainerPort: 80
+            - ContainerPort: 443
+          Environment:
+            - Name: APP_HOST
+              Value: !Ref AppHost
+            - Name: APP_PORT
+              Value: !Ref AppPort
+            - Name: VPC_CIDR
+              Value: !Ref VpcCidr
       Volumes:
         - Name: my-vol
       NetworkMode: bridge

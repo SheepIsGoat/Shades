@@ -2,4 +2,5 @@
 *.env
 .git
 node_modules
-
+build
+shades-ts

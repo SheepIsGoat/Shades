@@ -1,4 +1,5 @@
 import React from 'react';
+import { Tile } from '../interfaces/Tile';
 
 interface LikedTile {
   title: string;

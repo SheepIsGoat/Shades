@@ -1,12 +1,12 @@
 export interface Tile {
-    name: string;
-    title: string;
-    header: string;
-    slug: string;
-    status: string;
-    publishDate: Date;
-    owner: string;
-    imageUrl: string;
-    liked: boolean;
-  }
+  name: string;
+  title: string;
+  summary: string;
+  slug: string;
+  status: string;
+  publishDate: Date;
+  owner: string;
+  sharingImage1x1Url: string;
+  liked: boolean;
+}
 

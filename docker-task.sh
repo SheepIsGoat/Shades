@@ -18,7 +18,7 @@ CONTAINER_PORT=8080
 
 # Get version from package.json file so can tag the built image with version number.
 # If you don't have node installed, you can just hardcode the version number here.
-IMAGE_VERSION=1
+IMAGE_VERSION=2
 
 # Builds the Docker image and tags it with latest version number.
 buildImage () {

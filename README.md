@@ -11,6 +11,11 @@ curl --http1.1 -H "Authorization: Bearer $SANITY_TOKEN" "https://0unlbb72.api.sa
 # hit internal endpoint
 curl -X GET 'http://localhost:3000/search?q=dogs'
 
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"owner":"alex","name":null,"title":"cats v. dogs.","header":null,"slug":{"current":"cats-v-dogs","_type":"slug"},"status":"published","publishDate":"2022-07-05"}' \
+    'http://localhost:3000/like'
+
 
 # log in to aws
 aws configure

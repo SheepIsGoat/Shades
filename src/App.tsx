@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tile } from './interfaces/Tile'
 import { SearchComponent } from './components/SearchComponent';
 import { TileComponent } from './components/TileComponent';
+import RefreshButton from './components/RefreshButton';
 
 export const App: React.FC = () => {
   const [tiles, setTiles] = useState<Tile[]>([]);
+  const [likedTiles, setLikedTiles] = useState<Tile[]>([]);
+  const [titlesOfLiked, setLikedSet] = useState<Set<string>>(new Set());
+  const titleSet = new Set(titlesOfLiked);
 
   const handleSearch = async (searchTerm: string) => {
     console.log("Handle search called with term:", searchTerm);  // Debugging line
@@ -17,27 +21,75 @@ export const App: React.FC = () => {
         console.log("Response data:", data);  // Debugging line
         
         setTiles(data.result.map((tile: any) => ({
-            name: tile.name || 'Unknown', // Using 'Unknown' as a fallback value since name properties are null in your JSON
+            name: tile.name || 'Unknown', 
             title: tile.title,
-            header: tile.header || 'No Header', // Similarly, using a fallback for header
+            summary: tile.summary,
             slug: tile.slug.current,
             status: tile.status,
             publishDate: new Date(tile.publishDate),
             owner: tile.owner,
-            imageUrl: "https://cdn11.bigcommerce.com/s-hii7479o/images/stencil/original/products/13186/31212/sunglasses__57285.1558039245.png?c=2", // Keeping this as is, since imageUrl is not present in your JSON
-            liked: false,
+            sharingImage1x1Url: tile.sharingImage1x1Url, 
+            liked: tile.title in titleSet? true: false,
         })));
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
+  
+  function updateSearchLikes() {
+    titleSet.clear();
+    for (const tile of likedTiles) {
+      titleSet.add(tile.title);
+    }
+    console.log(`likedSet: ${[...titleSet]}`)
+    setLikedSet(titleSet);
+    let newArr = [...tiles];
+    for (const tile of newArr) {
+      if (titleSet.has(tile.title)) {
+        tile.liked = true;
+      } else {
+        tile.liked = false;
+      }
+    }
+    setTiles(newArr);
+  }
 
-  const handleToggleLike = (index: number) => {
-    const newTiles = [...tiles];
-    newTiles[index].liked = !newTiles[index].liked;
-    setTiles(newTiles);
+  useEffect(() => {
+    updateSearchLikes();
+  }, [likedTiles]);
 
+  const handleToggleLike = async (tile: Tile | null) => {
+    try {
+        const endpoint = tile == null || tile.liked? 'unlike': 'like';
+        const body = tile == null? '{}': JSON.stringify(tile);
+        console.log(`Hitting endpoint ${endpoint}`)
+        const response = await fetch(`http://localhost:80/${endpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: body,
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch data');
+        }
+
+        const data = await response.json();
+        console.log(`response: ${response}, data: ${JSON.stringify(data)}`)
+        // Assuming the response contains a list of JSON objects representing tiles
+        setLikedTiles(data);
+
+
+
+    } catch (error) {
+        console.error('Error:', error);
+        // Handle the error as needed, e.g., display an error message to the user
+    }
   };
+
+  useEffect(() => {
+    handleToggleLike(null);
+  }, []);
 
   return (
     <div style={{
@@ -60,15 +112,15 @@ export const App: React.FC = () => {
           <TileComponent
             key={index}
             name={tile.name}
-            header={tile.header}
+            summary={tile.summary}
             status={tile.status}
             publishDate={tile.publishDate}
             owner={tile.owner}
             title={tile.title}
             slug={tile.slug}
-            imageUrl={"https://cdn11.bigcommerce.com/s-hii7479o/images/stencil/original/products/13186/31212/sunglasses__57285.1558039245.png?c=2"}
+            sharingImage1x1Url={tile.sharingImage1x1Url}
             liked={tile.liked}
-            onToggleLike={() => handleToggleLike(index)}
+            onToggleLike={() => handleToggleLike(tile)}
             showLikeButton={true}
           />
         ))}
@@ -83,19 +135,20 @@ export const App: React.FC = () => {
         borderLeft: '1px solid #000'
       }}>
         <h2>Liked Tiles</h2>
-        {tiles.filter(tile => tile.liked).map((tile, index) => (
+        <RefreshButton></RefreshButton>
+        {likedTiles.map((tile, index) => (
           <TileComponent
             key={index}
             name={tile.name}
-            header={tile.header}
+            summary={tile.summary}
             status={tile.status}
             publishDate={tile.publishDate}
             owner={tile.owner}
             title={tile.title}
             slug={tile.slug}
-            imageUrl={"https://cdn11.bigcommerce.com/s-hii7479o/images/stencil/original/products/13186/31212/sunglasses__57285.1558039245.png?c=2"}
+            sharingImage1x1Url={tile.sharingImage1x1Url}
             liked={tile.liked}
-            onToggleLike={() => handleToggleLike(index)}
+            onToggleLike={() => handleToggleLike(tile)}
             showLikeButton={false}
           />
         ))}
