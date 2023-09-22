@@ -4,7 +4,7 @@ export SANITY_TOKEN="TOKEN"
 
 export GROQ_QUERY=$(echo '*[_type == "tile"][0..9] {name,title,header,slug,status,publishDate,owner}' | jq -sRr @uri)
 
-export GROQ_QUERY=$(echo '*[_type == "tile" && title match "*miley*"][0..9]{name,title,header,slug,status,publishDate,owner}' | jq -sRr @uri)
+export GROQ_QUERY=$(echo '*[_type == "tile" && title match "*miley*"][0..9]{name,title,header,slug,status,publishDate,owner,sharingImage1x1Url}' | jq -sRr @uri)
 
 curl --http1.1 -H "Authorization: Bearer $SANITY_TOKEN" "https://0unlbb72.api.sanity.io/v2022-03-29/data/query/dev?query=$GROQ_QUERY"
 
@@ -39,3 +39,9 @@ DOCKER_DIR="front"
 `sh docker-task.sh createrepo`
 `sh docker-task.sh buildpush`
 `sh docker-task.sh showimage`
+
+
+# deploy
+Do it from the CLI
+`aws cloudformation deploy --template-file cloudformation.yaml --option value # etc`
+Or do it from the console to take advantage of auto-populating fields like Subnets, etc.

@@ -5,9 +5,9 @@
 
 
 # Variables
-IMAGE_NAME="shades-backend"
-DOCKER_DIR="back"
 AWS_REGION="us-west-1"
+DOCKER_DIR="front"
+IMAGE_NAME="shades-${DOCKER_DIR}end"
 DOCKERFILE="docker/$DOCKER_DIR/Dockerfile"
 AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID  # "01234567890" a 12 digit number, from top right of console.
 REPOSITORY_PATH="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"

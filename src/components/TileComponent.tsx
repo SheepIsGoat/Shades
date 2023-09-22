@@ -18,7 +18,7 @@ export const TileComponent: React.FC<TileProps> = ({ name, title, summary, slug,
   return (
     <div>
       <img src={sharingImage1x1Url == null? 
-        "https://seeeff-prod-static-images.imgix.net/shades_logo.png?w=80&amp;auto=format&amp;dpr=2": //"https://cdn11.bigcommerce.com/s-hii7479o/images/stencil/original/products/13186/31212/sunglasses__57285.1558039245.png?c=2": 
+        "https://seeeff-prod-static-images.imgix.net/shades_logo.png?w=80&amp;auto=format&amp;dpr=2":  
         sharingImage1x1Url} 
         alt={title} 
         style={{ width: '100px', height: '50px' }} 

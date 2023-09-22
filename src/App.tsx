@@ -11,14 +11,14 @@ export const App: React.FC = () => {
   const titleSet = new Set(titlesOfLiked);
 
   const handleSearch = async (searchTerm: string) => {
-    console.log("Handle search called with term:", searchTerm);  // Debugging line
+    console.log("Handle search called with term:", searchTerm);
     try {
-        const response = await fetch(`http://localhost:80/search?q=${searchTerm}`);
+        const response = await fetch(`/search?q=${searchTerm}`); 
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
         const data: any = await response.json();
-        console.log("Response data:", data);  // Debugging line
+        console.log("Response data:", data); 
         
         setTiles(data.result.map((tile: any) => ({
             name: tile.name || 'Unknown', 
@@ -63,7 +63,7 @@ export const App: React.FC = () => {
         const endpoint = tile == null || tile.liked? 'unlike': 'like';
         const body = tile == null? '{}': JSON.stringify(tile);
         console.log(`Hitting endpoint ${endpoint}`)
-        const response = await fetch(`http://localhost:80/${endpoint}`, {
+        const response = await fetch(`/${endpoint}`, { 
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -83,7 +83,6 @@ export const App: React.FC = () => {
 
     } catch (error) {
         console.error('Error:', error);
-        // Handle the error as needed, e.g., display an error message to the user
     }
   };
 

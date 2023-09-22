@@ -41,15 +41,45 @@ http {
     } 
 
     location /search {
-        proxy_pass http://${APP_HOST}:${APP_PORT}/search;  # change backend to localhost to get working in ecs
+        proxy_pass http://${APP_HOST}:${APP_PORT}/search;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_cache_bypass $http_upgrade;
+        proxy_busy_buffers_size   128k;
+        proxy_buffers   4 128k;
+        proxy_buffer_size   64k;
     }
 
     location /like {
-        proxy_pass http://${APP_HOST}:${APP_PORT}/like;  # change backend to localhost to get working in ecs
+        proxy_pass http://${APP_HOST}:${APP_PORT}/like; 
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_cache_bypass $http_upgrade;
+        proxy_busy_buffers_size   128k;
+        proxy_buffers   4 128k;
+        proxy_buffer_size   64k;
     }
 
     location /unlike {
-        proxy_pass http://${APP_HOST}:${APP_PORT}/unlike;  # change backend to localhost to get working in ecs
+        proxy_pass http://${APP_HOST}:${APP_PORT}/unlike;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_cache_bypass $http_upgrade;
+        proxy_busy_buffers_size   128k;
+        proxy_buffers   4 128k;
+        proxy_buffer_size   64k;
     }
   }
 
@@ -63,7 +93,7 @@ http {
 
     location /search {
       # Reject requests with unsupported HTTP method
-      if ($request_method !~ ^(GET|POST|HEAD|OPTIONS|PUT|DELETE)$) {
+      if ($request_method !~ ^(GET)$) { # GET|POST|HEAD|OPTIONS|PUT|DELETE
         return 405;
       }
 
@@ -80,5 +110,47 @@ http {
       proxy_buffers   4 128k;
       proxy_buffer_size   64k;
     }
+
+    location /like {
+      # Reject requests with unsupported HTTP method
+      if ($request_method !~ ^(POST)$) { 
+        return 405;
+      }
+
+      # host/ip where the app is (host w/ be 'localhost' except in ?? situations)
+      proxy_pass http://${APP_HOST}:${APP_PORT};
+
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection 'upgrade';
+      proxy_set_header Host $host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_cache_bypass $http_upgrade;
+      proxy_busy_buffers_size   128k;
+      proxy_buffers   4 128k;
+      proxy_buffer_size   64k;
+    }
+
+    location /unlike {
+      # Reject requests with unsupported HTTP method
+      if ($request_method !~ ^(POST)$) {
+        return 405;
+      }
+
+      # host/ip where the app is (host w/ be 'localhost' except in ?? situations)
+      proxy_pass http://${APP_HOST}:${APP_PORT};
+
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection 'upgrade';
+      proxy_set_header Host $host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_cache_bypass $http_upgrade;
+      proxy_busy_buffers_size   128k;
+      proxy_buffers   4 128k;
+      proxy_buffer_size   64k;
+    }
+
+
   }
 }

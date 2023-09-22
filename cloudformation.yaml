@@ -169,12 +169,9 @@ Resources:
               awslogs-group: !Ref CloudwatchLogsGroup
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: shades
-          # MountPoints:
-          #   - ContainerPath: /usr/share/nginx/html
-          #     SourceVolume: my-vol
           PortMappings:
             - ContainerPort: 3000
-              # HostPort: 3000  # delete this, for external only
+              HostPort: 3000
           Environment:
             - Name: SANITY_TOKEN
               Value: !Ref SanityToken
@@ -196,7 +193,9 @@ Resources:
               SourceVolume: my-vol
           PortMappings:
             - ContainerPort: 80
+              HostPort: 80
             - ContainerPort: 443
+              HostPort: 443
           Environment:
             - Name: APP_HOST
               Value: !Ref AppHost
@@ -206,7 +205,7 @@ Resources:
               Value: !Ref VpcCidr
       Volumes:
         - Name: my-vol
-      NetworkMode: bridge
+      NetworkMode: host
 
   service:
     Type: 'AWS::ECS::Service'
@@ -242,7 +241,7 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref ECSTG
       LoadBalancerArn: !Ref ECSALB
-      Port: '80'  # change to port 8000 in console
+      Port: '80'
       Protocol: HTTP
 
   ECSALBListenerRule:

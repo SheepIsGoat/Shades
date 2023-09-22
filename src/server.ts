@@ -6,7 +6,7 @@ const path = require('path');
 const axios = require('axios');
 // const cors = require('cors');
 
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 // import { createClient } from '@sanity/client';
 
 
@@ -16,6 +16,12 @@ const PORT: number = 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'build')));
+app.use((_: null, res: Response, next: NextFunction) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Allow requests from any origin
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allow specified HTTP methods
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'); // Allow specified headers
+    next();
+});
 
 
 app.listen(PORT, () => {
