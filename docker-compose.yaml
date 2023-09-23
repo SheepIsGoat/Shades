@@ -3,8 +3,8 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: frontend # .
-      dockerfile: Dockerfile # docker/front/Dockerfile
+      context: frontend
+      dockerfile: Dockerfile
     ports:
       - "80:80"
     depends_on:
@@ -17,8 +17,8 @@ services:
 
   backend:
     build:
-      context: backend #.
-      dockerfile: Dockerfile #docker/back/Dockerfile
+      context: backend
+      dockerfile: Dockerfile
     environment:
       - SANITY_TOKEN=${SANITY_TOKEN}
     ports:
