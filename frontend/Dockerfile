@@ -15,7 +15,7 @@ FROM nginx:alpine
 RUN apk add --no-cache openssl
 COPY nginx.conf.template /etc/nginx/nginx.conf.template
 COPY --from=build /app/build /usr/share/nginx/html
-COPY default.conf /etc/nginx/conf.d/default.conf
+# COPY default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80 443
 
 COPY entrypoint.sh /

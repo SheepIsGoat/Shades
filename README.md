@@ -1,47 +1,25 @@
-# query sanity
-export SANITY_TOKEN="TOKEN"
+# Shades
+A demo web app
+Requirements:
+1. Typescript, Node.js, React
+2. Search content from Sanity.io API, and return in web page
+3. Items must have a like button that shows which posts have been liked/not-liked
+4. Must be additional 'liked' section that displays all tiles that are currently liked, and keeps state between sessions
+5. Must be deployed and accessible from a public IP
 
-
-export GROQ_QUERY=$(echo '*[_type == "tile"][0..9] {name,title,header,slug,status,publishDate,owner}' | jq -sRr @uri)
-
-export GROQ_QUERY=$(echo '*[_type == "tile" && title match "*miley*"][0..9]{name,title,header,slug,status,publishDate,owner,sharingImage1x1Url}' | jq -sRr @uri)
-
-curl --http1.1 -H "Authorization: Bearer $SANITY_TOKEN" "https://0unlbb72.api.sanity.io/v2022-03-29/data/query/dev?query=$GROQ_QUERY"
-
-# hit internal endpoint
-curl -X GET 'http://localhost:3000/search?q=dogs'
-
-curl -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"owner":"alex","name":null,"title":"cats v. dogs.","header":null,"slug":{"current":"cats-v-dogs","_type":"slug"},"status":"published","publishDate":"2022-07-05"}' \
-    'http://localhost:3000/like'
-
-
-# log in to aws
+# Log in to aws
 aws configure
 
-# create repository
-Edit the docker-task.sh to have your 
-```
-IMAGE_NAME="shades-backend"
-DOCKER_DIR="back"
-AWS_REGION="us-west-1"
-```
+# Build and push container image
+Create ECR repository
 `sh docker-task.sh createrepo`
+Build and push image
 `sh docker-task.sh buildpush`
-`sh docker-task.sh showimage`
-
-Modify again
-```
-IMAGE_NAME="shades-frontend"
-DOCKER_DIR="front"
-```
-`sh docker-task.sh createrepo`
-`sh docker-task.sh buildpush`
+Show image name in ECR
 `sh docker-task.sh showimage`
 
 
-# deploy
-Do it from the CLI
+# Deploy cloudformation stack
+Deploy from the cloudformation console to take advantage of auto-populating fields like Subnets, etc. (Recommended)
+Or deploy from the CLI
 `aws cloudformation deploy --template-file cloudformation.yaml --option value # etc`
-Or do it from the console to take advantage of auto-populating fields like Subnets, etc.

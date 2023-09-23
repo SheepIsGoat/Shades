@@ -29,7 +29,7 @@ export const App: React.FC = () => {
             publishDate: new Date(tile.publishDate),
             owner: tile.owner,
             sharingImage1x1Url: tile.sharingImage1x1Url, 
-            liked: tile.title in titleSet? true: false,
+            liked: titleSet.has(tile.title)? true: false,
         })));
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -86,8 +86,14 @@ export const App: React.FC = () => {
     }
   };
 
+  const updateLikes = async() => {
+    const response = await fetch(`/get_liked`);
+    const data = await response.json();
+    setLikedTiles(data);
+  }
+
   useEffect(() => {
-    handleToggleLike(null);
+    updateLikes();
   }, []);
 
   return (
