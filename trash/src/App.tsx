@@ -20,7 +20,7 @@ export const App: React.FC = () => {
         const data: any = await response.json();
         console.log("Response data:", data); 
         
-        setTiles(data.data.result.map((tile: any) => ({
+        setTiles(data.result.map((tile: any) => ({
             name: tile.name || 'Unknown', 
             title: tile.title,
             summary: tile.summary,

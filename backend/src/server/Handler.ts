@@ -1,26 +1,37 @@
 import { Request, Response } from 'express';
 
-type RequestHandler = (req: Request, res: Response) => Promise<asyncResult>;
-type asyncResult = [jsonAble, httpStatusCode];
-type jsonAble = object | Array<object> | void;
+type requestHandler<T> = (args: T) => Promise<httpResult>;
+interface httpResult {
+    statusCode: httpStatusCode;
+    data?: any;
+    meta?: {
+        errMsg?: string;
+    };
+}
+
+type httpRequest = Request;
+
 type httpStatusCode = 200 | 400 | 500;
 
-async function handle(funcs: Array<RequestHandler>, req: Request, res: Response){
+async function handle(funcs: Array<requestHandler<httpRequest>>, req: httpRequest, res: Response){
     try {
-        let obj: jsonAble = {};
-        let status: httpStatusCode = 500;
+        let result: httpResult = {
+            data: {},
+            statusCode: 500,
+        }
         for (const func of funcs) {
-            [obj, status] = await func(req, res);
-            if (status >= 400) {
-                break;
+            result = await func(req);
+            if (result.statusCode >= 400) {
+                return res.status(result.statusCode).json(result.meta?.errMsg);
             }
         }
-        return res.status(status).json(obj);
+        return res.status(result.statusCode).json(result.data);
     } catch(error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
-export type {RequestHandler, asyncResult, jsonAble, httpStatusCode};
+export type {requestHandler, httpResult, httpRequest, httpStatusCode};
 export {handle};
+
